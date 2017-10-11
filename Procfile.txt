@@ -1,1 +1,0 @@
-web: gunicorn BlackBoard_API.wsgi
