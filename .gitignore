@@ -1,3 +1,6 @@
 *.pyc
 *.tar.gz
 venv
+.idea/inspectionProfiles/
+.idea/workspace.xml
+templates/
