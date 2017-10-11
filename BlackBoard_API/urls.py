@@ -19,6 +19,7 @@ from django.contrib import admin
 from rest_framework import routers
 
 # Routers provide an easy way of automatically determining the URL conf.
+from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 
 from app import views
@@ -36,4 +37,5 @@ urlpatterns = [
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^auth', views.AuthViewSet.as_view()),
     url(r'^availability', views.AvailabiltyViewSet.as_view()),
+    url(r'^docs/', include_docs_urls(title='BlackBoard API Documentation'))
 ]

@@ -1,0 +1,7 @@
+{
+  "name": "BlackBoard_API",
+  "description": "An API for different levels of college management",
+  "repository": "https://github.com/krsnvijay/BlackBoard_API.git",
+  "logo": "https://i.imgur.com/S0aW9Na.jpg",
+  "keywords": ["python", "django", "rest_framework","api]
+}
