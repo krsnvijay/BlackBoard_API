@@ -5,23 +5,28 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.models import Faculty, Class, Schedule
-from app.serializers import FacultySerializer, ClassSerializer, ScheduleSerializer
+from app.models import Faculty, Class, Schedule, Responsibility
+from app.serializers import FacultySerializer, ClassSerializer, ScheduleSerializer, ResponsibilitySerializer
 
 
-class FacultyViewSet(viewsets.ModelViewSet):
+class FacultyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Faculty.objects.all()
     serializer_class = FacultySerializer
 
 
-class ClassViewSet(viewsets.ModelViewSet):
+class ClassViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
 
 
-class ScheduleViewSet(viewsets.ModelViewSet):
+class ScheduleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
+
+
+class ResponsibilityViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Responsibility.objects.all()
+    serializer_class = ResponsibilitySerializer
 
 
 class AuthViewSet(APIView):

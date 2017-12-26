@@ -1,57 +1,21 @@
+from django.core.validators import RegexValidator
 from django.db import models
-
 # Create your models here.
 from django.urls import reverse
 
-CSE = 'CSE'
-ECE = 'ECE'
-IT = 'IT'
-EEE = 'EEE'
-CIVIL = 'CIVIL'
-MECH = 'MECH'
-DEPT_CHOICES = (
-    (CSE, 'CSE'),
-    (ECE, 'ECE'),
-    (IT, 'IT'),
-    (EEE, 'EEE'),
-    (CIVIL, 'CIVIL'),
-    (MECH, 'MECH'))
-SECTION_CHOICES = (
-    ('A', 'A'),
-    ('B', 'B'),
-    ('C', 'C'),
-    ('D', 'D'),
-    ('E', 'E'),
-    ('F', 'F'))
-LOCATION_CHOICES = (
-    ('ADMIN', (
-        ('ADMIN-101', '101'),
-        ('ADMIN-102', '102'),
-        ('ADMIN-103', '103')
-    )
-     ),
-    ('B.M.S', (
-        ('B.M.S-101', '101'),
-        ('B.M.S-102', '102'),
-        ('B.M.S-103', '103')
-    )
-     ),
-    ('BLOCK-III', (
-        ('BLOCK-III-101', '101'),
-        ('BLOCK-III-102', '102'),
-        ('BLOCK-III-103', '103')
-    )
-     )
-)
+from choices_data.models import Dept_Choices, Room_Choices, Faculty_Choices, Subject_Choices
+
+alpha_caps = RegexValidator(r'^[A-Z]', 'Only cap characters are allowed.')
+year_validator = RegexValidator(r'^[1-5]', 'Only 1-5 are allowed.')
+hour_validator = RegexValidator(r'^[1-7]', 'Only 1-7 are allowed.')
 
 
 class Class(models.Model):
     class_id = models.CharField(max_length=30, primary_key=True, help_text='Enter Class ID eg.CSE-2-F', editable=False)
-    location = models.CharField(max_length=30, help_text='Choose Class Location', choices=LOCATION_CHOICES)
-    dept = models.CharField(max_length=5, choices=DEPT_CHOICES, help_text='Choose Department of the Class')
-    year = models.CharField(max_length=1, choices=(('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')),
-                            help_text='Choose Year Of The Class')
-    section = models.CharField(max_length=1, help_text='Choose Section Of The Class', choices=SECTION_CHOICES)
+    location = models.ForeignKey(Room_Choices, on_delete=models.CASCADE, related_name='Room_choice')
+    dept = models.ForeignKey(Dept_Choices, on_delete=models.CASCADE, related_name='Dept_choice')
+    year = models.CharField(max_length=1, help_text='Enter year Of The Class', validators=[year_validator])
+    section = models.CharField(max_length=1, help_text='Choose Section Of The Class', validators=[alpha_caps])
 
     class Meta:
         verbose_name_plural = 'classes'
@@ -65,22 +29,14 @@ class Class(models.Model):
         """
         Returns the url to access a particular instance of MyModelName.
         """
-        return reverse('model-detail-view', args=[str(self.class_id)])
+        return reverse('class-detail', args=[str(self.class_id)])
 
     def save(self, *args, **kwargs):
-        self.class_id = self.dept + "-" + self.year + "-" + self.section
+        self.class_id = self.dept.dept_code + "-" + self.year + "-" + self.section
         super(Class, self).save(*args, **kwargs)  # Call the "real" save()
 
 
 class Faculty(models.Model):
-    DEAN = 'DEAN'
-    HOD = 'HOD'
-    PROFESSOR = 'PROFESSOR'
-    FACULTY_TYPE_CHOICES = (
-        (DEAN, 'DEAN'),
-        (HOD, 'HOD'),
-        (PROFESSOR, 'PROFESSOR')
-    )
 
     class Meta:
         verbose_name_plural = 'faculties'
@@ -90,9 +46,8 @@ class Faculty(models.Model):
     email = models.EmailField(max_length=50, help_text='Enter Faculty\'s Email')
     password = models.CharField(max_length=30, help_text='Enter Faculty\'s Password', default=123456)
     phone = models.CharField(max_length=10, help_text='Enter Faculty\'s Phone')
-    dept = models.CharField(max_length=5, choices=DEPT_CHOICES, help_text='Choose Faculty\'s Dept')
-    faculty_type = models.CharField(max_length=100, choices=FACULTY_TYPE_CHOICES,
-                                    help_text='Choose Faculty\'s Designation')
+    dept = models.ForeignKey(Dept_Choices, on_delete=models.CASCADE, related_name='dept_choice')
+    faculty_type = models.ForeignKey(Faculty_Choices, on_delete=models.CASCADE, related_name='faculty_choice')
     incharge_of = models.OneToOneField(Class, on_delete=models.CASCADE, null=True, related_name='of_class', blank=True)
 
     def __str__(self):
@@ -102,18 +57,17 @@ class Faculty(models.Model):
         """
         Returns the url to access a particular instance of MyModelName.
         """
-        return reverse('model-detail-view', args=[str(self.faculty_id)])
+        return reverse('faculty-detail', args=[str(self.faculty_id)])
 
 
 class Schedule(models.Model):
     faculty_id = models.ForeignKey(Faculty, on_delete=models.CASCADE, related_name='faculty_schedule')
     class_id = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='class_schedule')
-    subj_code = models.CharField(max_length=10, help_text='Enter Subjcode')
+    subj_code = models.ForeignKey(Subject_Choices, on_delete=models.CASCADE, related_name='subject_choice')
     day = models.CharField(max_length=10, choices=(
         ('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'),
         ('Friday', 'Friday')), help_text='Choose The Day')
-    hour = models.CharField(max_length=1, help_text='Choose Section Of The Class', choices=(
-        ('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'), ('6', '6'), ('7', '7')))
+    hour = models.CharField(max_length=1, help_text='Choose hour Of The Class', validators=[hour_validator])
 
     class Meta:
         verbose_name_plural = 'schedules'
@@ -122,3 +76,27 @@ class Schedule(models.Model):
 
     def __str__(self):
         return self.faculty_id_id
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular instance of MyModelName.
+        """
+        return reverse('schedule-detail', args=[str(self.pk)])
+
+
+class Responsibility(models.Model):
+    responsibility_name = models.CharField(max_length=30, help_text='Enter Responsibility Name')
+    faculties_responsible = models.ManyToManyField(Faculty)
+
+    class Meta:
+        verbose_name_plural = 'responsibilties'
+        ordering = ["-responsibility_name"]
+
+    def __str__(self):
+        return self.responsibility_name
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular instance of MyModelName.
+        """
+        return reverse('responsibility-detail', args=[str(self.pk)])

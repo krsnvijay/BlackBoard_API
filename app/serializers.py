@@ -1,37 +1,29 @@
 from rest_framework import serializers
 
-from app.models import Faculty, Class, Schedule
+from app.models import Faculty, Class, Schedule, Responsibility
 
 
 class FacultySerializer(serializers.ModelSerializer):
-    faculty_list = serializers.SerializerMethodField()  # add field
     faculty_schedule = serializers.SerializerMethodField()
 
     class Meta:
         model = Faculty
         fields = (
-            'faculty_id', 'dept', 'name', 'email', 'password', 'phone', 'faculty_type', 'incharge_of', 'faculty_list',
+            'faculty_id', 'dept', 'name', 'email', 'password', 'phone', 'faculty_type', 'incharge_of',
             'faculty_schedule')
 
-    def get_faculty_list(self, obj):
-        if (obj.faculty_type == "HOD"):
-            return Faculty.objects.filter(dept=obj.dept).values('faculty_id', 'name')
-        elif (obj.faculty_type == "DEAN"):
-            return Faculty.objects.filter(faculty_type="HOD").values('faculty_id', 'name', 'phone', 'dept')
-
     def get_faculty_schedule(self, obj):
-        if (obj.faculty_type == "PROFESSOR"):
             return Schedule.objects.filter(faculty_id=obj.faculty_id).values('class_id', 'subj_code', 'day', 'hour',
                                                                              'class_id__location')
 
 
-class ScheduleSerializer(serializers.HyperlinkedModelSerializer):
+class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = ('faculty_id', 'class_id', 'subj_code', 'day', 'hour')
 
 
-class ClassSerializer(serializers.HyperlinkedModelSerializer):
+class ClassSerializer(serializers.ModelSerializer):
     class_timetable = serializers.SerializerMethodField()
 
     class Meta:
@@ -40,3 +32,9 @@ class ClassSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_class_timetable(self, obj):
         return Schedule.objects.filter(class_id=obj.class_id).values('faculty_id__name', 'subj_code', 'day', 'hour')
+
+
+class ResponsibilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Responsibility
+        fields = '__all__'

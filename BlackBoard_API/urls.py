@@ -17,18 +17,24 @@ from django.conf.urls import url, include
 from django.contrib import admin
 # Serializers define the API representation.
 from rest_framework import routers
-
 # Routers provide an easy way of automatically determining the URL conf.
 from rest_framework.documentation import include_docs_urls
 from rest_framework.schemas import get_schema_view
 
 from app import views
+from choices_data import views as ChoicesViews
 
 schema_view = get_schema_view(title='BlackBoard API')
 router = routers.DefaultRouter()
 router.register(r'faculties', views.FacultyViewSet)
 router.register(r'classes', views.ClassViewSet)
 router.register(r'schedules', views.ScheduleViewSet)
+router.register(r'responsibilities', views.ResponsibilityViewSet)
+router.register(r'dept-choices', ChoicesViews.DeptChoicesViewSet)
+router.register(r'faculty-choices', ChoicesViews.FacultyChoicesViewSet)
+router.register(r'room-choices', ChoicesViews.RoomChoicesViewSet)
+router.register(r'block-choices', ChoicesViews.BlockChoicesViewSet)
+router.register(r'subject-choices', ChoicesViews.SubjectChoicesViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
