@@ -27,7 +27,7 @@ class Block_Choices(models.Model):
 
 class Room_Choices(models.Model):
     block_name = models.ForeignKey(Block_Choices, on_delete=models.CASCADE, related_name='block_details')
-    room_name = models.CharField(max_length=30, primary_key=True, help_text='Enter room Name (101,201)')
+    room_name = models.CharField(max_length=30, help_text='Enter room Name (101,201)')
 
     class Meta:
         verbose_name_plural = 'Room Choices'
