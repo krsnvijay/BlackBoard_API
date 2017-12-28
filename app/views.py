@@ -1,7 +1,9 @@
 from django.http import Http404
+from django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
 # ViewSets define the view behavior.
 from rest_framework import viewsets
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,16 +14,22 @@ from app.serializers import FacultySerializer, ClassSerializer, ScheduleSerializ
 class FacultyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Faculty.objects.all()
     serializer_class = FacultySerializer
-
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_fields = ('faculty_id', 'password', 'name', 'dept', 'incharge_of', 'faculty_type', 'email')
+    search_fields = ('faculty_id', 'name')
 
 class ClassViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
+    filter_backends = (DjangoFilterBackend)
+    filter_fields = ('class_id', 'year', 'dept', 'section', 'location')
 
 
 class ScheduleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
+    filter_backends = (DjangoFilterBackend)
+    filter_fields = ('class_id', 'faculty_id', 'subj_code', 'day', 'hour')
 
 
 class ResponsibilityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -57,7 +65,9 @@ class AvailabiltyViewSet(APIView):
         try:
             set1 = Faculty.objects.filter(dept=dept, faculty_schedule__day=day, faculty_schedule__hour=hour).values(
                 'faculty_id')
-            set2 = Faculty.objects.filter(dept=dept).exclude(faculty_id__in=set1).values('faculty_id', 'name', 'phone')
+            set2 = Faculty.objects.filter(dept=dept).exclude(faculty_id__in=set1).values('faculty_id', 'name', 'phone',
+                                                                                         'faculty_type', 'email',
+                                                                                         'dept', 'incharge_of')
             return set2
         except Faculty.DoesNotExist:
             raise Http404
@@ -67,9 +77,4 @@ class AvailabiltyViewSet(APIView):
         day = self.request.query_params.get('day', None)
         hour = self.request.query_params.get('hour', None)
         availability = self.get_object(dept, day, hour)
-        response = {}
-        response['dept'] = dept
-        response['day'] = day
-        response['hour'] = hour
-        response['availability'] = availability
-        return Response(response)
+        return Response(availability)
