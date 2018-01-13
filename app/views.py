@@ -3,6 +3,7 @@ from django_filters import rest_framework as filters
 # Create your views here.
 # ViewSets define the view behavior.
 from rest_framework import viewsets
+from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -28,8 +29,10 @@ class ClassViewSet(viewsets.ReadOnlyModelViewSet):
 class ScheduleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
+    filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
     filter_fields = ('class_id', 'faculty_id', 'subj_code', 'day', 'hour')
+    ordering_fields = ('day', 'hour')
+    ordering = ('day', 'hour')
 
 
 class ResponsibilityViewSet(viewsets.ReadOnlyModelViewSet):

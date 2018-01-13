@@ -71,7 +71,7 @@ class Schedule(models.Model):
 
     class Meta:
         verbose_name_plural = 'schedules'
-        ordering = ["-faculty_id"]
+        ordering = ["-day", "hour"]
         unique_together = ("class_id", "subj_code", "day", "hour")
 
     def __str__(self):
