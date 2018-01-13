@@ -10,6 +10,7 @@ admin.site.site_header = 'Black Board Administration'
 
 class FacultyResource(resources.ModelResource):
     class Meta:
+        import_id_fields = ('faculty_id',)
         model = Faculty
 
 
@@ -20,6 +21,7 @@ class ScheduleResource(resources.ModelResource):
 
 class ClassResource(resources.ModelResource):
     class Meta:
+        import_id_fields = ('class_id',)
         model = Class
 
 class ClassInline(admin.TabularInline):
