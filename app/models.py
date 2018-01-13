@@ -7,7 +7,7 @@ from choices_data.models import Dept_Choices, Room_Choices, Faculty_Choices, Sub
 
 alpha_caps = RegexValidator(r'^[A-Z]', 'Only cap characters are allowed.')
 year_validator = RegexValidator(r'^[1-5]', 'Only 1-5 are allowed.')
-hour_validator = RegexValidator(r'^[1-7]', 'Only 1-7 are allowed.')
+hour_validator = RegexValidator(r'^[1-8]', 'Only 1-8 are allowed.')
 
 
 class Class(models.Model):
@@ -86,7 +86,7 @@ class Schedule(models.Model):
 
 class Responsibility(models.Model):
     responsibility_name = models.CharField(max_length=30, help_text='Enter Responsibility Name')
-    faculties_responsible = models.ManyToManyField(Faculty)
+    faculties_responsible = models.ManyToManyField(Faculty, related_name='responsibilities')
 
     class Meta:
         verbose_name_plural = 'responsibilties'

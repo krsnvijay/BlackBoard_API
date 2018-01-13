@@ -1,5 +1,5 @@
 from django.http import Http404
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
 # Create your views here.
 # ViewSets define the view behavior.
 from rest_framework import viewsets
@@ -14,21 +14,21 @@ from app.serializers import FacultySerializer, ClassSerializer, ScheduleSerializ
 class FacultyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Faculty.objects.all()
     serializer_class = FacultySerializer
-    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_backends = (SearchFilter, filters.DjangoFilterBackend)
     filter_fields = ('faculty_id', 'password', 'name', 'dept', 'incharge_of', 'faculty_type', 'email')
     search_fields = ('faculty_id', 'name')
 
 class ClassViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Class.objects.all()
     serializer_class = ClassSerializer
-    filter_backends = (DjangoFilterBackend)
+    filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('class_id', 'year', 'dept', 'section', 'location')
 
 
 class ScheduleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-    filter_backends = (DjangoFilterBackend)
+    filter_backends = (filters.DjangoFilterBackend,)
     filter_fields = ('class_id', 'faculty_id', 'subj_code', 'day', 'hour')
 
 

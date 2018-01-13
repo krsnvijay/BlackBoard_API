@@ -4,15 +4,19 @@ from app.models import Faculty, Class, Schedule, Responsibility
 
 
 class FacultySerializer(serializers.ModelSerializer):
+    responsibilities = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = Faculty
         fields = (
-            'faculty_id', 'dept', 'name', 'email', 'phone', 'faculty_type', 'incharge_of')
+            'faculty_id', 'dept', 'name', 'email', 'phone', 'faculty_type', 'incharge_of', 'responsibilities')
+
 
 class ScheduleSerializer(serializers.ModelSerializer):
     class_location = serializers.SerializerMethodField()
     subj_name = serializers.SerializerMethodField()
     faculty_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Schedule
         fields = ('faculty_name', 'class_id', 'class_location', 'subj_code', 'subj_name', 'day', 'hour')
@@ -26,9 +30,11 @@ class ScheduleSerializer(serializers.ModelSerializer):
     def get_faculty_name(self, obj):
         return obj.faculty_id.name
 
+
 class ClassSerializer(serializers.ModelSerializer):
     class_timetable = serializers.SerializerMethodField()
     class_location = serializers.SerializerMethodField()
+
     class Meta:
         model = Class
         fields = ('class_id', 'dept', 'year', 'section', 'class_location', 'class_timetable')
