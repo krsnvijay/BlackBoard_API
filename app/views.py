@@ -38,6 +38,9 @@ class ScheduleViewSet(viewsets.ReadOnlyModelViewSet):
 class ResponsibilityViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Responsibility.objects.all()
     serializer_class = ResponsibilitySerializer
+    filter_backends = (filters.DjangoFilterBackend, SearchFilter)
+    filter_fields = ('responsibility_name',)
+    search_fields = ('responsibility_name',)
 
 
 class AuthViewSet(APIView):

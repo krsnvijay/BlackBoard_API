@@ -47,6 +47,11 @@ class ClassSerializer(serializers.ModelSerializer):
 
 
 class ResponsibilitySerializer(serializers.ModelSerializer):
+    faculties_responsible = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
     class Meta:
         model = Responsibility
         fields = '__all__'
